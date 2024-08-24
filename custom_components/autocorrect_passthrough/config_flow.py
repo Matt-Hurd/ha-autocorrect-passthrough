@@ -63,7 +63,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_create_entry(
             title=user_input.get(CONF_NAME, DEFAULT_NAME), 
-            data=user_input,
+            data={},
+            options={
+                CONF_AGENT_URL: user_input[CONF_AGENT_URL],
+                CONF_DEBUG_LEVEL: user_input.get(CONF_DEBUG_LEVEL, DEFAULT_DEBUG_LEVEL),
+            },
         )
 
     @staticmethod
@@ -78,21 +82,15 @@ class OptionsFlow(config_entries.OptionsFlow):
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
         self.config_entry = config_entry
-        self._options = dict(config_entry.data)
-        self._options.update(dict(config_entry.options))
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Manage the options."""
         if user_input is not None:
-            self._options.update(user_input)
-            return self.async_create_entry(
-                title=self._options.get(CONF_NAME, DEFAULT_NAME), 
-                data=self._options,
-            )
+            return self.async_create_entry(title="", data=user_input)
 
-        schema = self.agent_config_option_schema(self._options)
+        schema = self.agent_config_option_schema(self.config_entry.options)
 
         return self.async_show_form(
             step_id="init",
@@ -104,12 +102,11 @@ class OptionsFlow(config_entries.OptionsFlow):
         return {
             vol.Required(
                 CONF_AGENT_URL,
-                description={"suggested_value": options.get(CONF_AGENT_URL, "")},
+                default=options.get(CONF_AGENT_URL, ""),
             ): str,
             vol.Required(
                 CONF_DEBUG_LEVEL, 
-                description={"suggested_value": options.get(CONF_DEBUG_LEVEL, DEFAULT_DEBUG_LEVEL)},
-                default=DEFAULT_DEBUG_LEVEL,
+                default=options.get(CONF_DEBUG_LEVEL, DEFAULT_DEBUG_LEVEL),
             ): SelectSelector(
                 SelectSelectorConfig(
                     options=[
