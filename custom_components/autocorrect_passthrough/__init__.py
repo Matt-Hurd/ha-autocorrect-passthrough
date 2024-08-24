@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import traceback
 import aiohttp
 
 from homeassistant.components import conversation
@@ -75,6 +76,8 @@ class ModifiedConversationAgent(conversation.AbstractConversationAgent):
                         raise Exception(f"Error from agent: {response.status}")
         except Exception as e:
             _LOGGER.error("Error communicating with agent: %s", str(e))
+            _LOGGER.error("Traceback:\n%s", traceback.format_exc())
+
             intent_response = intent.IntentResponse(language=user_input.language)
             intent_response.async_set_error(
                 intent.IntentResponseErrorCode.UNKNOWN,
