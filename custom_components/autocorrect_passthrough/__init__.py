@@ -53,13 +53,22 @@ class ModifiedConversationAgent(conversation.AbstractConversationAgent):
     ) -> conversation.ConversationResult:
         """Process a sentence."""
         debug_level = self.entry.options.get(CONF_DEBUG_LEVEL, DEBUG_LEVEL_NO_DEBUG)
+        
+        input_data = {
+            "text": user_input.text,
+            "context": user_input.context.as_dict(),
+            "conversation_id": user_input.conversation_id,
+            "device_id": user_input.device_id,
+            "language": user_input.language,
+            "agent_id": user_input.agent_id,
+        }
 
         if user_input.conversation_id is None:
             user_input.conversation_id = ulid.ulid()
 
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.post(self.agent_url, json=user_input) as response:
+                async with session.post(self.agent_url, json=input_data) as response:
                     if response.status == 200:
                         result_text = await response.text()
                     else:
