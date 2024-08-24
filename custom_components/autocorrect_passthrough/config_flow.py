@@ -19,7 +19,7 @@ from homeassistant.helpers.selector import (
 
 from .const import (
     CONF_DEBUG_LEVEL,
-    CONF_ADDON_SLUG,
+    CONF_AGENT_URL,
     DEBUG_LEVEL_NO_DEBUG,
     DEBUG_LEVEL_LOW_DEBUG,
     DEBUG_LEVEL_VERBOSE_DEBUG,
@@ -33,7 +33,7 @@ _LOGGER = logging.getLogger(__name__)
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): str,
-        vol.Required(CONF_ADDON_SLUG): str,
+        vol.Required(CONF_AGENT_URL): str,
         vol.Optional(CONF_DEBUG_LEVEL, default=DEFAULT_DEBUG_LEVEL): SelectSelector(
             SelectSelectorConfig(
                 options=[
@@ -103,8 +103,8 @@ class OptionsFlow(config_entries.OptionsFlow):
         """Return a schema for Modified Agent options."""
         return {
             vol.Required(
-                CONF_ADDON_SLUG,
-                description={"suggested_value": options.get(CONF_ADDON_SLUG, "")},
+                CONF_AGENT_URL,
+                description={"suggested_value": options.get(CONF_AGENT_URL, "")},
             ): str,
             vol.Required(
                 CONF_DEBUG_LEVEL, 
