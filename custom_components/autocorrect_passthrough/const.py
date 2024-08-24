@@ -1,6 +1,6 @@
 """Constants for the Autocorrect integration."""
 
-DOMAIN = "modified_conversation"
+DOMAIN = "autocorrect_passthrough"
 
 CONF_DEBUG_LEVEL = 'debug_level'
 CONF_AGENT_URL = 'agent_url'

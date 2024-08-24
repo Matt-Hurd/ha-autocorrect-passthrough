@@ -36,6 +36,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 class ModifiedConversationAgent(conversation.AbstractConversationAgent):
     """Autocorrect."""
 
+    @property
+    def supported_languages(self) -> list[str]:
+        """Return a list of supported languages."""
+        # You can modify this to return the languages your agent supports
+        return ["en"]
+
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         """Initialize the agent."""
         self.hass = hass
