@@ -16,7 +16,7 @@ from homeassistant.helpers import (
 
 from .const import (
     CONF_DEBUG_LEVEL,
-    CONF_AGENT_URL,
+    CONF_ADDON_SLUG,
     DEBUG_LEVEL_NO_DEBUG,
     DEBUG_LEVEL_LOW_DEBUG,
     DEBUG_LEVEL_VERBOSE_DEBUG,
@@ -46,7 +46,7 @@ class ModifiedConversationAgent(conversation.AbstractConversationAgent):
         """Initialize the agent."""
         self.hass = hass
         self.entry = entry
-        self.agent_url = entry.options.get(CONF_AGENT_URL)
+        self.addon_slug = entry.data[CONF_ADDON_SLUG]
 
     async def async_process(
         self, user_input: conversation.ConversationInput
@@ -67,8 +67,11 @@ class ModifiedConversationAgent(conversation.AbstractConversationAgent):
             user_input.conversation_id = ulid.ulid()
 
         try:
+            addon_info = await self.hass.components.hassio.async_get_addon_info(self.addon_slug)
+            addon_url = f"http://{self.addon_slug}:{addon_info['port']}/process"  # Adjust the endpoint as needed
+
             async with aiohttp.ClientSession() as session:
-                async with session.post(self.agent_url, json=input_data) as response:
+                async with session.post(addon_url, json=input_data) as response:
                     if response.status == 200:
                         result_text = await response.text()
                     else:

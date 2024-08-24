@@ -3,7 +3,7 @@
 DOMAIN = "autocorrect_passthrough"
 
 CONF_DEBUG_LEVEL = 'debug_level'
-CONF_AGENT_URL = 'agent_url'
+CONF_ADDON_SLUG = 'addon_slug'
 
 DEBUG_LEVEL_NO_DEBUG = "none"
 DEBUG_LEVEL_LOW_DEBUG = "low"
