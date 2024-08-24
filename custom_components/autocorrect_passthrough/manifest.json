@@ -1,0 +1,17 @@
+{
+    "domain": "autocorrect_passthrough",
+    "name": "Autocorrect Passthrough",
+    "codeowners": [
+      "@matt-hurd"
+    ],
+    "config_flow": true,
+    "dependencies": [
+      "conversation"
+    ],
+    "documentation": "https://github.com/matt-hurd/ha-autocorrect-passthrough",
+    "integration_type": "service",
+    "iot_class": "local_polling",
+    "issue_tracker": "https://github.com/matt-hurd/ha-autocorrect-passthrough/issues",
+    "requirements": [],
+    "version": "1.0.0"
+  }

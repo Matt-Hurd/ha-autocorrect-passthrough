@@ -1,19 +1,16 @@
-"""Config flow for Fallback Conversation integration."""
+"""Config flow for Autocorrect integration."""
 from __future__ import annotations
 
 import logging
-# from types import MappingProxyType
 from typing import Any
 
 import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_NAME
-from homeassistant.core import HomeAssistant, async_get_hass, callback
+from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.selector import (
-    ConversationAgentSelector, 
-    ConversationAgentSelectorConfig,
     SelectSelector,
     SelectSelectorConfig,
     SelectOptionDict,
@@ -22,8 +19,7 @@ from homeassistant.helpers.selector import (
 
 from .const import (
     CONF_DEBUG_LEVEL,
-    CONF_PRIMARY_AGENT,
-    CONF_FALLBACK_AGENT,
+    CONF_AGENT_URL,
     DEBUG_LEVEL_NO_DEBUG,
     DEBUG_LEVEL_LOW_DEBUG,
     DEBUG_LEVEL_VERBOSE_DEBUG,
@@ -37,6 +33,7 @@ _LOGGER = logging.getLogger(__name__)
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): str,
+        vol.Required(CONF_AGENT_URL): str,
         vol.Optional(CONF_DEBUG_LEVEL, default=DEFAULT_DEBUG_LEVEL): SelectSelector(
             SelectSelectorConfig(
                 options=[
@@ -51,7 +48,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 )
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Fallback Agent config flow."""
+    """Modified Agent config flow."""
 
     VERSION = 1
 
@@ -76,7 +73,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return OptionsFlow(config_entry)
 
 class OptionsFlow(config_entries.OptionsFlow):
-    """Fallback config flow options handler."""
+    """Modified config flow options handler."""
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
@@ -91,20 +88,24 @@ class OptionsFlow(config_entries.OptionsFlow):
         if user_input is not None:
             self._options.update(user_input)
             return self.async_create_entry(
-                title=user_input.get(CONF_NAME, DEFAULT_NAME), 
+                title=self._options.get(CONF_NAME, DEFAULT_NAME), 
                 data=self._options,
             )
 
-        schema = await self.fallback_config_option_schema(self._options)
+        schema = self.agent_config_option_schema(self._options)
 
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(schema),
         )
 
-    async def fallback_config_option_schema(self, options: dict) -> dict:
-        """Return a schema for Fallback options."""
+    def agent_config_option_schema(self, options: dict) -> dict:
+        """Return a schema for Modified Agent options."""
         return {
+            vol.Required(
+                CONF_AGENT_URL,
+                description={"suggested_value": options.get(CONF_AGENT_URL, "")},
+            ): str,
             vol.Required(
                 CONF_DEBUG_LEVEL, 
                 description={"suggested_value": options.get(CONF_DEBUG_LEVEL, DEFAULT_DEBUG_LEVEL)},
@@ -119,13 +120,4 @@ class OptionsFlow(config_entries.OptionsFlow):
                     mode=SelectSelectorMode.DROPDOWN
                 ),
             ),
-            vol.Required(
-                CONF_PRIMARY_AGENT,
-                description={"suggested_value": options.get(CONF_PRIMARY_AGENT, "homeassistant")},
-                default="homeassistant",
-            ): ConversationAgentSelector(ConversationAgentSelectorConfig()),
-            vol.Required(
-                CONF_FALLBACK_AGENT,
-                description={"suggested_value": options.get(CONF_FALLBACK_AGENT, "")},
-            ): ConversationAgentSelector(ConversationAgentSelectorConfig()),
-        };
+        }

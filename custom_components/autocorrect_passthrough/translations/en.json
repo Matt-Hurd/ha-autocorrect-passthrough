@@ -1,0 +1,30 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "name": "Name",
+          "agent_url": "Agent URL",
+          "debug_level": "Debug Level"
+        },
+        "data_description": {
+          "agent_url": "The URL of your conversation agent endpoint"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Autocorrect Options",
+        "data": {
+          "agent_url": "Agent URL",
+          "debug_level": "Debug Level"
+        },
+        "data_description": {
+          "agent_url": "The URL of your conversation agent endpoint"
+        }
+      }
+    }
+  }
+}
